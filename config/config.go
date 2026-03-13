@@ -1,0 +1,47 @@
+package config
+
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
+
+type Config struct {
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+	DBSSLMode  string
+	AppPort    string
+	AppEnv     string
+}
+
+var AppConfig *Config
+
+func NewConfig() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("File .env tidak ditemukan, menggunakan environment variable sistem")
+	}
+
+	AppConfig = &Config{
+		DBHost:     getEnv("DB_HOST", "localhost"),
+		DBPort:     getEnv("DB_PORT", "5432"),
+		DBUser:     getEnv("DB_USER", "postgres"),
+		DBPassword: getEnv("DB_PASSWORD", "yourpassword"),
+		DBName:     getEnv("DB_NAME", "pangantara"),
+		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
+		AppPort:    getEnv("APP_PORT", "8080"),
+		AppEnv:     getEnv("APP_ENV", "development"),
+	}
+
+	log.Println("Konfigurasi berhasil dimuat")
+}
+
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
+}

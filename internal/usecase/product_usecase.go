@@ -61,6 +61,10 @@ func UpdateProduct(id uuid.UUID, req model.UpdateProductRequest) error {
 	return repository.UpdateProduct(id, data)
 }
 
+func UpdateProductImage(id uuid.UUID, path string) error {
+	return repository.UpdateProduct(id, map[string]interface{}{"image_url": path})
+}
+
 func DeleteProduct(id uuid.UUID) error {
 	return repository.DeleteProduct(id)
 }

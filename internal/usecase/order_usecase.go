@@ -13,7 +13,6 @@ func CreateOrder(req model.CreateOrderRequest) (*entity.Order, error) {
 	orderID := uuid.New()
 	var totalAmount float64
 
-	// Hitung total amount dari semua item
 	for _, item := range req.Items {
 		product, err := repository.GetProductByID(item.ProductID)
 		if err != nil {
@@ -35,7 +34,6 @@ func CreateOrder(req model.CreateOrderRequest) (*entity.Order, error) {
 		return nil, err
 	}
 
-	// Simpan setiap item order detail
 	for _, item := range req.Items {
 		detail := &entity.OrderDetail{
 			DetailID:  uuid.New(),
@@ -65,6 +63,10 @@ func GetOrderBySPPGID(sppgID uuid.UUID) ([]entity.Order, error) {
 
 func GetOrderByStatus(status entity.OrderStatus) ([]entity.Order, error) {
 	return repository.GetOrderByStatus(status)
+}
+
+func GetOrdersFiltered(status string, sppgID *uuid.UUID, startDate, endDate *string, page, limit int) ([]entity.Order, int64, error) {
+	return repository.GetOrdersFiltered(entity.OrderStatus(status), sppgID, startDate, endDate, page, limit)
 }
 
 func UpdateOrderStatus(id uuid.UUID, req model.UpdateOrderStatusRequest) error {

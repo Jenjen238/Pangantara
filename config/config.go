@@ -9,16 +9,21 @@ import (
 )
 
 type Config struct {
-	DBHost     string
-	DBPort     string
-	DBUser     string
-	DBPassword string
-	DBName     string
-	DBSSLMode  string
-	AppPort    string
-	AppEnv     string
-	JWTSecret  string
-	JWTExpiredMinute int 
+	DBHost           string
+	DBPort           string
+	DBUser           string
+	DBPassword       string
+	DBName           string
+	DBSSLMode        string
+	AppPort          string
+	AppEnv           string
+	JWTSecret        string
+	JWTExpiredMinute int
+	SMTPHost         string
+	SMTPPort         int
+	SMTPEmail        string
+	SMTPPassword     string
+	SMTPName         string
 }
 
 var AppConfig *Config
@@ -28,7 +33,8 @@ func NewConfig() {
 		log.Println("File .env tidak ditemukan, menggunakan environment variable sistem")
 	}
 
-	jwtExpiredMinute, _ := strconv.Atoi(getEnv("JWT_EXPIRED_MINUTE", "15")) 
+	jwtExpiredMinute, _ := strconv.Atoi(getEnv("JWT_EXPIRED_MINUTE", "15"))
+	smtpPort, _ := strconv.Atoi(getEnv("SMTP_PORT", "587"))
 
 	AppConfig = &Config{
 		DBHost:           getEnv("DB_HOST", "localhost"),
@@ -40,11 +46,17 @@ func NewConfig() {
 		AppPort:          getEnv("APP_PORT", "8080"),
 		AppEnv:           getEnv("APP_ENV", "development"),
 		JWTSecret:        getEnv("JWT_SECRET", "secret"),
-		JWTExpiredMinute: jwtExpiredMinute, 
+		JWTExpiredMinute: jwtExpiredMinute,
+		SMTPHost:         getEnv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:         smtpPort,
+		SMTPEmail:        getEnv("SMTP_EMAIL", ""),
+		SMTPPassword:     getEnv("SMTP_PASSWORD", ""),
+		SMTPName:         getEnv("SMTP_NAME", "Pangantara"),
 	}
 
 	log.Println("Konfigurasi berhasil dimuat")
 }
+
 func getEnv(key, fallback string) string {
 	if val := os.Getenv(key); val != "" {
 		return val

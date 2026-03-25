@@ -1,8 +1,8 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
-	"sppg-backend/internal/entity"
 	"sppg-backend/internal/model"
 	"sppg-backend/internal/usecase"
 
@@ -38,21 +38,55 @@ func createOrder(c *gin.Context) {
 
 func getAllOrder(c *gin.Context) {
 	status := c.Query("status")
-	if status != "" {
-		list, err := usecase.GetOrderByStatus(entity.OrderStatus(status))
+	sppgIDStr := c.Query("sppg_id")
+	startDate := c.Query("start_date")
+	endDate := c.Query("end_date")
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
+
+	page, limit := 1, 10
+	fmt.Sscanf(pageStr, "%d", &page)
+	fmt.Sscanf(limitStr, "%d", &limit)
+
+	if status == "" && sppgIDStr == "" && startDate == "" && endDate == "" {
+		list, err := usecase.GetAllOrder()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, model.OrderFail(err.Error()))
 			return
 		}
-		c.JSON(http.StatusOK, model.OrderOK("OK", list))
+		c.JSON(http.StatusOK, model.OrderOK("OK", gin.H{"data": list, "total": len(list)}))
 		return
 	}
-	list, err := usecase.GetAllOrder()
+
+	var sppgID *uuid.UUID
+	if sppgIDStr != "" {
+		id, err := uuid.Parse(sppgIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, model.OrderFail("sppg_id tidak valid"))
+			return
+		}
+		sppgID = &id
+	}
+
+	var startPtr, endPtr *string
+	if startDate != "" {
+		startPtr = &startDate
+	}
+	if endDate != "" {
+		endPtr = &endDate
+	}
+
+	list, total, err := usecase.GetOrdersFiltered(status, sppgID, startPtr, endPtr, page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.OrderFail(err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, model.OrderOK("OK", list))
+	c.JSON(http.StatusOK, model.OrderOK("OK", gin.H{
+		"data":  list,
+		"total": total,
+		"page":  page,
+		"limit": limit,
+	}))
 }
 
 func getOrderByID(c *gin.Context) {

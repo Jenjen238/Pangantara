@@ -33,9 +33,6 @@ func Connect() {
 }
 
 func Migrate() {
-
-	DB.Exec("SET session_replication_role = replica;")
-
 	err := DB.AutoMigrate(
 		&entity.User{},
 		&entity.SPPG{},
@@ -45,11 +42,9 @@ func Migrate() {
 		&entity.Order{},
 		&entity.OrderDetail{},
 		&entity.Transaction{},
+		&entity.ResetPassword{}, 
+		&entity.SupplierDraft{},
 	)
-
-
-	DB.Exec("SET session_replication_role = DEFAULT;")
-
 	if err != nil {
 		log.Fatalf("AutoMigrate gagal: %v", err)
 	}

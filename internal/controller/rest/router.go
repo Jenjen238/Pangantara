@@ -7,21 +7,25 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
+	r.Static("/uploads", "./uploads")
+
 	api := r.Group("/api/v1")
 
-	// Public routes (tidak perlu token)
 	AuthRoutes(api)
+	ForgotPasswordRoutes(api)
 
-	// Protected routes (perlu token)
 	protected := api.Group("")
 	protected.Use(middleware.AuthMiddleware())
 	{
+		DashboardRoutes(protected)
 		UserRoutes(protected)
 		SPPGRoutes(protected)
 		SupplierRoutes(protected)
+		UploadRoutes(protected)
 		ProductRoutes(protected)
 		StockRoutes(protected)
 		OrderRoutes(protected)
 		TransactionRoutes(protected)
+		SupplierDraftRoutes(protected)
 	}
 }

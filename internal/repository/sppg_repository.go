@@ -36,3 +36,9 @@ func UpdateSPPG(id uuid.UUID, data map[string]interface{}) error {
 func DeleteSPPG(id uuid.UUID) error {
 	return postgres.DB.Delete(&entity.SPPG{}, "sppg_id = ?", id).Error
 }
+
+func CountSPPG() (int64, error) {
+	var count int64
+	err := postgres.DB.Model(&entity.SPPG{}).Count(&count).Error
+	return count, err
+}

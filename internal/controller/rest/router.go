@@ -14,13 +14,15 @@ func RegisterRoutes(r *gin.Engine) {
 
 	api := r.Group("/api/v1")
 
-	// Auth routes dengan rate limiter ketat (anti brute force)
+	// Auth routes dengan rate limiter 
 	authGroup := api.Group("")
 	authGroup.Use(middleware.AuthRateLimiter())
 	{
 		AuthRoutes(authGroup)
 		ForgotPasswordRoutes(authGroup)
 	}
+
+	WebhookRoutes(api)
 
 	// Protected routes
 	protected := api.Group("")
@@ -35,7 +37,8 @@ func RegisterRoutes(r *gin.Engine) {
 		StockRoutes(protected)
 		OrderRoutes(protected)
 		TransactionRoutes(protected)
-
+		PaymentRoutes(protected)
+		
 		// Upload dengan rate limiter khusus
 		uploadGroup := protected.Group("")
 		uploadGroup.Use(middleware.UploadRateLimiter())

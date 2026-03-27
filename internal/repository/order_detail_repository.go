@@ -13,8 +13,7 @@ func CreateOrderDetail(d *entity.OrderDetail) error {
 
 func GetOrderDetailByOrderID(orderID uuid.UUID) ([]entity.OrderDetail, error) {
 	var list []entity.OrderDetail
-	err := postgres.DB.Preload("Product").
-		Where("order_id = ?", orderID).Find(&list).Error
+	err := postgres.DB.Where("order_id = ?", orderID).Find(&list).Error
 	return list, err
 }
 

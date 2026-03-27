@@ -24,6 +24,9 @@ type Config struct {
 	SMTPEmail        string
 	SMTPPassword     string
 	SMTPName         string
+	MidtransServerKey string
+	MidtransClientKey string
+	MidtransEnv      string
 }
 
 var AppConfig *Config
@@ -37,21 +40,24 @@ func NewConfig() {
 	smtpPort, _ := strconv.Atoi(getEnv("SMTP_PORT", "587"))
 
 	AppConfig = &Config{
-		DBHost:           getEnv("DB_HOST", "localhost"),
-		DBPort:           getEnv("DB_PORT", "5432"),
-		DBUser:           getEnv("DB_USER", "postgres"),
-		DBPassword:       getEnv("DB_PASSWORD", "yourpassword"),
-		DBName:           getEnv("DB_NAME", "pangantara"),
-		DBSSLMode:        getEnv("DB_SSLMODE", "disable"),
-		AppPort:          getEnv("APP_PORT", "8080"),
-		AppEnv:           getEnv("APP_ENV", "development"),
-		JWTSecret:        getEnv("JWT_SECRET", "secret"),
-		JWTExpiredMinute: jwtExpiredMinute,
-		SMTPHost:         getEnv("SMTP_HOST", "smtp.gmail.com"),
-		SMTPPort:         smtpPort,
-		SMTPEmail:        getEnv("SMTP_EMAIL", ""),
-		SMTPPassword:     getEnv("SMTP_PASSWORD", ""),
-		SMTPName:         getEnv("SMTP_NAME", "Pangantara"),
+		DBHost:            getEnv("DB_HOST", "localhost"),
+		DBPort:            getEnv("DB_PORT", "5432"),
+		DBUser:            getEnv("DB_USER", "postgres"),
+		DBPassword:        getEnv("DB_PASSWORD", "yourpassword"),
+		DBName:            getEnv("DB_NAME", "pangantara"),
+		DBSSLMode:         getEnv("DB_SSLMODE", "disable"),
+		AppPort:           getEnv("APP_PORT", "8080"),
+		AppEnv:            getEnv("APP_ENV", "development"),
+		JWTSecret:         getEnv("JWT_SECRET", "secret"),
+		JWTExpiredMinute:  jwtExpiredMinute,
+		SMTPHost:          getEnv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:          smtpPort,
+		SMTPEmail:         getEnv("SMTP_EMAIL", ""),
+		SMTPPassword:      getEnv("SMTP_PASSWORD", ""),
+		SMTPName:          getEnv("SMTP_NAME", "Pangantara"),
+		MidtransServerKey: getEnv("MIDTRANS_SERVER_KEY", ""),
+		MidtransClientKey: getEnv("MIDTRANS_CLIENT_KEY", ""),
+		MidtransEnv:       getEnv("MIDTRANS_ENV", "sandbox"),
 	}
 
 	log.Println("Konfigurasi berhasil dimuat")

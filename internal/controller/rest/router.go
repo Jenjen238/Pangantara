@@ -7,13 +7,22 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
+	// Global rate limiter untuk semua request
+	r.Use(middleware.GlobalRateLimiter())
+
 	r.Static("/uploads", "./uploads")
 
 	api := r.Group("/api/v1")
 
-	AuthRoutes(api)
-	ForgotPasswordRoutes(api)
+	// Auth routes dengan rate limiter ketat (anti brute force)
+	authGroup := api.Group("")
+	authGroup.Use(middleware.AuthRateLimiter())
+	{
+		AuthRoutes(authGroup)
+		ForgotPasswordRoutes(authGroup)
+	}
 
+	// Protected routes
 	protected := api.Group("")
 	protected.Use(middleware.AuthMiddleware())
 	{
@@ -21,11 +30,17 @@ func RegisterRoutes(r *gin.Engine) {
 		UserRoutes(protected)
 		SPPGRoutes(protected)
 		SupplierRoutes(protected)
-		UploadRoutes(protected)
+		SupplierDraftRoutes(protected)
 		ProductRoutes(protected)
 		StockRoutes(protected)
 		OrderRoutes(protected)
 		TransactionRoutes(protected)
-		SupplierDraftRoutes(protected)
+
+		// Upload dengan rate limiter khusus
+		uploadGroup := protected.Group("")
+		uploadGroup.Use(middleware.UploadRateLimiter())
+		{
+			UploadRoutes(uploadGroup)
+		}
 	}
 }

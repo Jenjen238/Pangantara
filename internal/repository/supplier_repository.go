@@ -64,3 +64,21 @@ func CountSupplierByStatus(status entity.VerificationStatus) (int64, error) {
 	err := postgres.DB.Model(&entity.Supplier{}).Where("verification_status = ?", status).Count(&count).Error
 	return count, err
 }
+
+func SearchSupplier(keyword, category, status string) ([]entity.Supplier, error) {
+	var list []entity.Supplier
+	db := postgres.DB.Model(&entity.Supplier{})
+
+	if keyword != "" {
+		db = db.Where("store_name ILIKE ?", "%"+keyword+"%")
+	}
+	if category != "" {
+		db = db.Where("category = ?", category)
+	}
+	if status != "" {
+		db = db.Where("verification_status = ?", status)
+	}
+
+	err := db.Order("store_name ASC").Find(&list).Error
+	return list, err
+}

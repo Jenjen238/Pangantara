@@ -121,6 +121,10 @@ func UpdateSupplierDocument(id uuid.UUID, docType string, path string) error {
 	return repository.UpdateSupplier(id, data)
 }
 
+func SearchSupplier(keyword, category, status string) ([]entity.Supplier, error) {
+	return repository.SearchSupplier(keyword, category, status)
+}
+
 func DeleteSupplier(id uuid.UUID) error {
 	return repository.DeleteSupplier(id)
 }

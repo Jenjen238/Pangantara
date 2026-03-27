@@ -38,7 +38,20 @@ func createSupplier(c *gin.Context) {
 }
 
 func getAllSupplier(c *gin.Context) {
+	keyword := c.Query("keyword")
+	category := c.Query("category")
 	status := c.Query("status")
+
+	if keyword != "" || category != "" {
+		list, err := usecase.SearchSupplier(keyword, category, status)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, model.SupplierFail(err.Error()))
+			return
+		}
+		c.JSON(http.StatusOK, model.SupplierOK("OK", list))
+		return
+	}
+
 	if status != "" {
 		list, err := usecase.GetSupplierByVerificationStatus(status)
 		if err != nil {
@@ -48,6 +61,7 @@ func getAllSupplier(c *gin.Context) {
 		c.JSON(http.StatusOK, model.SupplierOK("OK", list))
 		return
 	}
+
 	list, err := usecase.GetAllSupplier()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.SupplierFail(err.Error()))

@@ -19,8 +19,9 @@ func GetAllOrder() ([]entity.Order, error) {
 
 func GetOrderByID(id uuid.UUID) (*entity.Order, error) {
 	var o entity.Order
-	err := postgres.DB.Preload("OrderDetail").Preload("Transaction").
-		First(&o, "order_id = ?", id).Error
+	err := postgres.DB.
+		Preload("OrderDetails").First(&o, "order_id = ?", id).Error
+
 	return &o, err
 }
 

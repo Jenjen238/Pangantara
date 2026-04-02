@@ -7,14 +7,12 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	// Global rate limiter untuk semua request
 	r.Use(middleware.GlobalRateLimiter())
-
 	r.Static("/uploads", "./uploads")
 
 	api := r.Group("/api/v1")
 
-	// Auth routes dengan rate limiter 
+	// Public routes
 	authGroup := api.Group("")
 	authGroup.Use(middleware.AuthRateLimiter())
 	{
@@ -22,6 +20,7 @@ func RegisterRoutes(r *gin.Engine) {
 		ForgotPasswordRoutes(authGroup)
 	}
 
+	// Webhook
 	WebhookRoutes(api)
 
 	// Protected routes
@@ -33,17 +32,22 @@ func RegisterRoutes(r *gin.Engine) {
 		SPPGRoutes(protected)
 		SupplierRoutes(protected)
 		SupplierDraftRoutes(protected)
-		ProductRoutes(protected)
-		StockRoutes(protected)
 		OrderRoutes(protected)
 		TransactionRoutes(protected)
 		PaymentRoutes(protected)
-		
-		// Upload dengan rate limiter khusus
-		uploadGroup := protected.Group("")
-		uploadGroup.Use(middleware.UploadRateLimiter())
+
+		// Endpoint yang butuh supplier verified
+		supplierVerified := protected.Group("")
+		supplierVerified.Use(middleware.SupplierVerifiedMiddleware())
 		{
-			UploadRoutes(uploadGroup)
+			ProductRoutes(supplierVerified)
+			StockRoutes(supplierVerified)
+
+			uploadGroup := supplierVerified.Group("")
+			uploadGroup.Use(middleware.UploadRateLimiter())
+			{
+				UploadRoutes(uploadGroup)
+			}
 		}
 	}
 }

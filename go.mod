@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/midtrans/midtrans-go v1.3.8
+	github.com/supabase-community/storage-go v0.8.1
 	github.com/ulule/limiter/v3 v3.11.2
 	golang.org/x/crypto v0.49.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df

@@ -60,7 +60,7 @@ func getUserByID(c *gin.Context) {
 
 func updateUser(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
+	if err != nil{
 		c.JSON(http.StatusBadRequest, model.BadRequest("Invalid ID format"))
 		return
 	}

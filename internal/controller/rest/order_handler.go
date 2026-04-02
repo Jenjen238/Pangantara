@@ -49,16 +49,6 @@ func getAllOrder(c *gin.Context) {
 	fmt.Sscanf(pageStr, "%d", &page)
 	fmt.Sscanf(limitStr, "%d", &limit)
 
-	if status == "" && sppgIDStr == "" && startDate == "" && endDate == "" {
-		list, err := usecase.GetAllOrder()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, model.InternalError())
-			return
-		}
-		c.JSON(http.StatusOK, model.OK(gin.H{"data": list, "total": len(list)}))
-		return
-	}
-
 	var sppgID *uuid.UUID
 	if sppgIDStr != "" {
 		id, err := uuid.Parse(sppgIDStr)

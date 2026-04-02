@@ -41,58 +41,62 @@ func GetTransactionByOrderID(orderID uuid.UUID) (*entity.Transaction, error) {
 func UpdateTransactionStatus(id uuid.UUID, req model.UpdatePaymentStatusRequest) error {
 	transaction, err := repository.GetTransactionByID(id)
 	if err != nil {
-		return errors.New("transaksi tidak ditemukan")
+		return errors.New("transaction not found")
 	}
 
-	// Update payment status
-	if err := repository.UpdateTransactionStatus(id, entity.PaymentStatus(req.PaymentStatus)); err != nil {
-		return err
+	// Tentukan order status berdasarkan payment status
+	var orderStatus entity.OrderStatus
+	switch entity.PaymentStatus(req.PaymentStatus) {
+	case entity.PaymentPaid:
+		orderStatus = entity.OrderProcessing
+	case entity.PaymentFailed:
+		orderStatus = entity.OrderCancelled
+	default:
+		return repository.UpdateTransactionStatus(id, entity.PaymentStatus(req.PaymentStatus))
 	}
 
-	// Sync order status berdasarkan payment status
-	if req.PaymentStatus == string(entity.PaymentPaid) {
-		_ = repository.UpdateOrderStatus(transaction.OrderID, entity.OrderProcessing)
-	} else if req.PaymentStatus == string(entity.PaymentFailed) {
-		_ = repository.UpdateOrderStatus(transaction.OrderID, entity.OrderCancelled)
+	if err := repository.UpdateTransactionAndOrderStatus(
+		id,
+		entity.PaymentStatus(req.PaymentStatus),
+		transaction.OrderID,
+		orderStatus,
+	); err != nil {
+		return errors.New("failed to update payment and order status")
 	}
 
 	// Kirim email notifikasi
-	if req.PaymentStatus == string(entity.PaymentPaid) || req.PaymentStatus == string(entity.PaymentFailed) {
-		order, err := repository.GetOrderByID(transaction.OrderID)
-		if err != nil {
-			log.Println("[EMAIL ERROR] GetOrderByID gagal:", err)
-			return nil
-		}
-
-		sppg, err := repository.GetSPPGByID(order.SPPGID)
-		if err != nil {
-			log.Println("[EMAIL ERROR] GetSPPGByID gagal:", err)
-			return nil
-		}
-
-		user, err := repository.GetUserByID(sppg.UserID)
-		if err != nil {
-			log.Println("[EMAIL ERROR] GetUserByID gagal:", err)
-			return nil
-		}
-
-		orderIDStr := transaction.OrderID.String()
-		log.Println("[EMAIL] Mengirim email ke:", user.Email)
-
-		go func() {
-			var emailErr error
-			if req.PaymentStatus == string(entity.PaymentPaid) {
-				emailErr = email.SendPaymentConfirmedEmail(user.Email, user.Name, orderIDStr, order.TotalAmount)
-			} else {
-				emailErr = email.SendPaymentRejectedEmail(user.Email, user.Name, orderIDStr, order.TotalAmount)
-			}
-			if emailErr != nil {
-				log.Println("[EMAIL ERROR] Gagal kirim email:", emailErr)
-			} else {
-				log.Println("[EMAIL SUCCESS] Email terkirim ke:", user.Email)
-			}
-		}()
+	order, err := repository.GetOrderByID(transaction.OrderID)
+	if err != nil {
+		log.Println("[EMAIL ERROR] GetOrderByID failed:", err)
+		return nil
 	}
+
+	sppg, err := repository.GetSPPGByID(order.SPPGID)
+	if err != nil {
+		log.Println("[EMAIL ERROR] GetSPPGByID failed:", err)
+		return nil
+	}
+
+	user, err := repository.GetUserByID(sppg.UserID)
+	if err != nil {
+		log.Println("[EMAIL ERROR] GetUserByID failed:", err)
+		return nil
+	}
+
+	orderIDStr := transaction.OrderID.String()
+	go func() {
+		var emailErr error
+		if req.PaymentStatus == string(entity.PaymentPaid) {
+			emailErr = email.SendPaymentConfirmedEmail(user.Email, user.Name, orderIDStr, order.TotalAmount)
+		} else {
+			emailErr = email.SendPaymentRejectedEmail(user.Email, user.Name, orderIDStr, order.TotalAmount)
+		}
+		if emailErr != nil {
+			log.Println("[EMAIL ERROR] Failed to send email:", emailErr)
+		} else {
+			log.Println("[EMAIL SUCCESS] Email sent to:", user.Email)
+		}
+	}()
 
 	return nil
 }

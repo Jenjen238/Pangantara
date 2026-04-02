@@ -16,17 +16,30 @@ func Init() {
 
 	Router = gin.Default()
 
-	Router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
-		c.Header("Access-Control-Expose-Headers", "Content-Length")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
-	})
+	allowedOrigins := []string{
+    "http://localhost:8080",           
+    "https://be-internship.bccdev.id/hanif", 
+	"https://pangantara.vercel.app",        
+}
+
+Router.Use(func(c *gin.Context) {
+    origin := c.Request.Header.Get("Origin")
+    for _, allowed := range allowedOrigins {
+        if origin == allowed {
+            c.Header("Access-Control-Allow-Origin", origin)
+            break
+        }
+    }
+    c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+    c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
+    c.Header("Access-Control-Allow-Credentials", "true")
+    c.Header("Access-Control-Expose-Headers", "Content-Length")
+    if c.Request.Method == "OPTIONS" {
+        c.AbortWithStatus(204)
+        return
+    }
+    c.Next()
+})
 
 	Router.MaxMultipartMemory = 10 << 20 // 10 MB
 

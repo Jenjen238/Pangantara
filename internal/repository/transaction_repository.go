@@ -5,6 +5,7 @@ import (
 	"sppg-backend/pkg/postgres"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func CreateTransaction(t *entity.Transaction) error {
@@ -33,6 +34,31 @@ func UpdateTransactionStatus(id uuid.UUID, status entity.PaymentStatus) error {
 	return postgres.DB.Model(&entity.Transaction{}).
 		Where("transaction_id = ?", id).
 		Update("payment_status", status).Error
+}
+
+func UpdateTransactionAndOrderStatus(
+	transactionID uuid.UUID,
+	paymentStatus entity.PaymentStatus,
+	orderID uuid.UUID,
+	orderStatus entity.OrderStatus,
+) error {
+	return postgres.DB.Transaction(func(tx *gorm.DB) error {
+		// Update payment status
+		if err := tx.Model(&entity.Transaction{}).
+			Where("transaction_id = ?", transactionID).
+			Update("payment_status", paymentStatus).Error; err != nil {
+			return err
+		}
+
+		// Update order status
+		if err := tx.Model(&entity.Order{}).
+			Where("order_id = ?", orderID).
+			Update("order_status", orderStatus).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func DeleteTransaction(id uuid.UUID) error {

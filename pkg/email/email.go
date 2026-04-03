@@ -66,7 +66,7 @@ func SendSupplierApprovedEmail(to, name, storeName string) error {
 					<li>Menerima pesanan dari SPPG</li>
 				</ul>
 				<div style="text-align: center; margin: 30px 0;">
-					<a href="http://localhost:3000/supplier/dashboard" style="background-color: #2D6A4F; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+					<a href="https://be-internship.bccdev.id/hanif/supplier/dashboard" style="background-color: #2D6A4F; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 						Masuk ke Dashboard
 					</a>
 				</div>
@@ -102,7 +102,7 @@ func SendSupplierRejectedEmail(to, name, storeName string, notes *string) error 
 				</div>
 				<p>Kamu dapat mendaftar ulang setelah memperbaiki kekurangan di atas.</p>
 				<div style="text-align: center; margin: 30px 0;">
-					<a href="http://localhost:3000/register/supplier" style="background-color: #F4A261; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+					<a href="https://be-internship.bccdev.id/hanif/register/supplier" style="background-color: #F4A261; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 						Daftar Ulang
 					</a>
 				</div>
@@ -134,7 +134,7 @@ func SendPaymentConfirmedEmail(to, name, orderID string, totalAmount float64) er
 				</div>
 				<p>Pesanan kamu sedang diproses dan akan segera dikirim.</p>
 				<div style="text-align: center; margin: 30px 0;">
-					<a href="http://localhost:3000/sppg/orders" style="background-color: #2D6A4F; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+					<a href="https://be-internship.bccdev.id/hanif/sppg/orders" style="background-color: #2D6A4F; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 						Lihat Pesanan
 					</a>
 				</div>
@@ -172,7 +172,7 @@ func SendPaymentRejectedEmail(to, name, orderID string, totalAmount float64) err
 				</ul>
 				<p>Silakan upload ulang bukti transfer yang benar.</p>
 				<div style="text-align: center; margin: 30px 0;">
-					<a href="http://localhost:3000/sppg/orders" style="background-color: #F4A261; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+					<a href="https://be-internship.bccdev.id/hanif/sppg/orders" style="background-color: #F4A261; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 						Upload Ulang Bukti Transfer
 					</a>
 				</div>

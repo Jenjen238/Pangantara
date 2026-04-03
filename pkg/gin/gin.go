@@ -19,7 +19,7 @@ func Init() {
 	allowedOrigins := []string{
     "http://localhost:8080",           
     "https://be-internship.bccdev.id/hanif", 
-	"https://pangantara.vercel.app",     
+	"https://pangantara.vercel.app",
 	"http://localhost:3000",
 }
 

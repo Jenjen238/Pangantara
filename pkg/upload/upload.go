@@ -20,7 +20,7 @@ const (
 )
 
 var allowedDocumentTypes = map[string]bool{
-	".pdf": true, ".jpg": true, ".jpeg": true, ".png": true,
+	".jpg": true, ".jpeg": true, ".png": true,
 }
 
 var allowedImageTypes = map[string]bool{

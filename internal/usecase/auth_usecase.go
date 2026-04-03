@@ -32,7 +32,32 @@ func Register(req model.CreateUserRequest) (*entity.User, error) {
 		Role:     entity.UserRole(req.Role),
 	}
 
-	return user, repository.CreateUser(user)
+	if err := repository.CreateUser(user); err != nil {
+		return nil, err
+	}
+
+	if req.Role == "supplier" {
+		supplier := &entity.Supplier{
+			SupplierID:         uuid.New(),
+			UserID:             user.UserID,
+			StoreName:          user.Name,
+			VerificationStatus: entity.VerificationPending,
+		}
+		if err := repository.CreateSupplier(supplier); err != nil {
+			return nil, err
+		}
+	} else if req.Role == "sppg" {
+		sppg := &entity.SPPG{
+			SPPGID:   uuid.New(),
+			UserID:   user.UserID,
+			NameSPPG: user.Name,
+		}
+		if err := repository.CreateSPPG(sppg); err != nil {
+			return nil, err
+		}
+	}
+
+	return user, nil
 }
 
 func Login(req model.LoginRequest) (*model.LoginResponse, error) {
